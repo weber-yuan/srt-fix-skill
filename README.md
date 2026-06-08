@@ -38,21 +38,33 @@
 
 ### 在 Cowork 專案裡用（推薦，不需要 `.claude/`）
 
-Cowork 的 sandbox 可能**不允許建立 `.` 開頭的隱藏目錄**（例如 `.claude/`）。所以最簡單可靠的方式，就是用一個**一般資料夾**＋**讓 Cowork 直接讀 `SKILL.md`**：
+Cowork 的 sandbox 可能**不允許建立 `.` 開頭的隱藏目錄**（例如 `.claude/`）。最簡單可靠的方式：把這個 repo 的檔案**直接放進你的工作目錄**，再讓 Cowork 讀 `SKILL.md`。
 
-1. 在你的專案裡指定/建立一個**普通資料夾**（例如 `srt-fix/`，不要用 `.` 開頭的隱藏目錄）。
-2. 把這個 repo 的**所有檔案複製進去**：
+1. 指定一個工作目錄（例如你的專案資料夾 `my-project/`）。
+2. 把 repo 的檔案**直接放進該目錄**——**不要再多包一層 `srt-fix/`**。放好後，`SKILL.md`、`scripts/`、`data/` 應該就直接在工作目錄底下：
 
-   ```bash
-   git clone https://github.com/weber-yuan/srt-fix-skill srt-fix
+   ```
+   my-project/
+   ├── SKILL.md
+   ├── scripts/srt_tools.py
+   ├── data/vocab.json
+   └── examples/ …
    ```
 
-   （或在 GitHub 按 **Code → Download ZIP**，解壓後把內容放進該資料夾。）
-3. **使用方式**：直接請 Cowork **讀取該資料夾的 `SKILL.md` 並依其執行**，例如：
+   兩種做法：
+   - **下載 ZIP（最簡單）**：GitHub → **Code → Download ZIP**，解壓後把**裡面的檔案**（不是外層那層資料夾）搬進工作目錄。
+   - **clone 到目前目錄**（目錄需為空，注意結尾的 `.`）：
 
-   > 「讀 `srt-fix/SKILL.md`，照它的流程幫我修正 `episode1.srt`」
+     ```bash
+     cd my-project
+     git clone https://github.com/weber-yuan/srt-fix-skill .
+     ```
 
-   Cowork 會讀 `SKILL.md`，照裡面的步驟去跑 `srt-fix/scripts/srt_tools.py`。
+3. **使用方式**：在該目錄對 Cowork 說：
+
+   > 「讀 `SKILL.md`，幫我修正字幕 `xxx.srt`」
+
+   Cowork 會讀 `SKILL.md`，照裡面的步驟去跑 `scripts/srt_tools.py`。
 
 > 這個方式不依賴任何隱藏目錄或自動觸發機制，所以最不會踩到 sandbox 限制。
 

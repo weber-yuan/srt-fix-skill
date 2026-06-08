@@ -78,16 +78,27 @@
 <h2>安裝與使用</h2>
 
 <h3>在 Cowork 專案裡用（推薦，不需要 <code>.claude/</code>）</h3>
-<p>Cowork 的 sandbox 可能<strong>不允許建立 <code>.</code> 開頭的隱藏目錄</strong>（例如 <code>.claude/</code>）。所以最簡單可靠的方式，就是用一個<strong>一般資料夾</strong>＋<strong>讓 Cowork 直接讀 <code>SKILL.md</code></strong>：</p>
+<p>Cowork 的 sandbox 可能<strong>不允許建立 <code>.</code> 開頭的隱藏目錄</strong>（例如 <code>.claude/</code>）。最簡單可靠的方式：把這個 repo 的檔案<strong>直接放進你的工作目錄</strong>，再讓 Cowork 讀 <code>SKILL.md</code>。</p>
 <ol>
-  <li>在你的專案裡指定/建立一個<strong>普通資料夾</strong>（例如 <code>srt-fix/</code>，不要用 <code>.</code> 開頭的隱藏目錄）。</li>
-  <li>把這個 repo 的<strong>所有檔案複製進去</strong>：
-    <pre><code>git clone https://github.com/weber-yuan/srt-fix-skill srt-fix</code></pre>
-    （或在 GitHub 按 <strong>Code → Download ZIP</strong>，解壓後把內容放進該資料夾。）
+  <li>指定一個工作目錄（例如你的專案資料夾 <code>my-project/</code>）。</li>
+  <li>把 repo 的檔案<strong>直接放進該目錄</strong>——<strong>不要再多包一層 <code>srt-fix/</code></strong>。放好後，<code>SKILL.md</code>、<code>scripts/</code>、<code>data/</code> 應該就直接在工作目錄底下：
+    <pre><code>my-project/
+├── SKILL.md
+├── scripts/srt_tools.py
+├── data/vocab.json
+└── examples/ …</code></pre>
+    兩種做法：
+    <ul>
+      <li><strong>下載 ZIP（最簡單）</strong>：GitHub → <strong>Code → Download ZIP</strong>，解壓後把<strong>裡面的檔案</strong>（不是外層那層資料夾）搬進工作目錄。</li>
+      <li><strong>clone 到目前目錄</strong>（目錄需為空，注意結尾的 <code>.</code>）：
+        <pre><code>cd my-project
+git clone https://github.com/weber-yuan/srt-fix-skill .</code></pre>
+      </li>
+    </ul>
   </li>
-  <li><strong>使用方式</strong>：直接請 Cowork <strong>讀取該資料夾的 <code>SKILL.md</code> 並依其執行</strong>，例如：
-    <blockquote>「讀 <code>srt-fix/SKILL.md</code>，照它的流程幫我修正 <code>episode1.srt</code>」</blockquote>
-    Cowork 會讀 <code>SKILL.md</code>，照裡面的步驟去跑 <code>srt-fix/scripts/srt_tools.py</code>。
+  <li><strong>使用方式</strong>：在該目錄對 Cowork 說：
+    <blockquote>「讀 <code>SKILL.md</code>，幫我修正字幕 <code>xxx.srt</code>」</blockquote>
+    Cowork 會讀 <code>SKILL.md</code>，照裡面的步驟去跑 <code>scripts/srt_tools.py</code>。
   </li>
 </ol>
 <blockquote>這個方式不依賴任何隱藏目錄或自動觸發機制，所以最不會踩到 sandbox 限制。</blockquote>
