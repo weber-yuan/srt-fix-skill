@@ -1,6 +1,6 @@
-# srt-fix — 字幕修正與斷句 Skill
+# srt-fix — 字幕修正與斷句工具
 
-一個給 **Claude Code / Claude Cowork** 用的 skill：把現成的 SRT 字幕（通常來自語音辨識 / ASR）整理乾淨——**修正同音字與錯別字、正規化數字格式、再把長句斷成適合上字幕的短句**。輸出繁體中文（台灣用語）。
+一個給 **Claude Code / Claude Cowork** 用的工具（透過 `CLAUDE.md` 自動載入）：把現成的 SRT 字幕（通常來自語音辨識 / ASR）整理乾淨——**修正同音字與錯別字、正規化數字格式、再把長句斷成適合上字幕的短句**。輸出繁體中文（台灣用語）。
 
 ## 它做什麼
 
@@ -36,16 +36,14 @@
 
 ## 安裝與使用
 
-### 在 Cowork 專案裡用（推薦，不需要 `.claude/`）
+採用 **`CLAUDE.md` 自動載入**機制：Claude Code / Cowork 會**自動讀取工作目錄下的 `CLAUDE.md`**。所以你只要把檔案放進一個工作目錄，就能直接用——**不需要 `.claude/` 隱藏目錄、也不需要任何「skill 安裝」步驟**（這正好避開 Cowork sandbox 不能建立 `.` 開頭目錄的限制）。
 
-Cowork 的 sandbox 可能**不允許建立 `.` 開頭的隱藏目錄**（例如 `.claude/`）。最簡單可靠的方式：把這個 repo 的檔案**直接放進你的工作目錄**，再讓 Cowork 讀 `SKILL.md`。
-
-1. 指定一個工作目錄（例如你的專案資料夾 `my-project/`）。
-2. 把 repo 的檔案**直接放進該目錄**——**不要再多包一層 `srt-fix/`**。放好後，`SKILL.md`、`scripts/`、`data/` 應該就直接在工作目錄底下：
+1. 指定一個工作目錄（建議用一個**專門處理字幕的資料夾**，例如 `my-subs/`）。
+2. 把 repo 的檔案**直接放進該目錄**——**不要再多包一層 `srt-fix/`**。放好後，`CLAUDE.md`、`scripts/`、`data/` 應該就直接在工作目錄底下：
 
    ```
-   my-project/
-   ├── SKILL.md
+   my-subs/
+   ├── CLAUDE.md
    ├── scripts/srt_tools.py
    ├── data/vocab.json
    └── examples/ …
@@ -56,28 +54,17 @@ Cowork 的 sandbox 可能**不允許建立 `.` 開頭的隱藏目錄**（例如 
    - **clone 到目前目錄**（目錄需為空，注意結尾的 `.`）：
 
      ```bash
-     cd my-project
+     cd my-subs
      git clone https://github.com/weber-yuan/srt-fix-skill .
      ```
 
-3. **使用方式**：在該目錄對 Cowork 說：
+3. **使用方式**：把你的 `.srt` 也放進這個目錄，然後直接說：
 
-   > 「讀 `SKILL.md`，幫我修正字幕 `xxx.srt`」
+   > 「**幫我修正字幕 `xxx.srt`**」
 
-   Cowork 會讀 `SKILL.md`，照裡面的步驟去跑 `scripts/srt_tools.py`。
+   `CLAUDE.md` 已被自動讀取，Claude 會照裡面的流程去跑 `scripts/srt_tools.py`，不必你特別點名。
 
-> 這個方式不依賴任何隱藏目錄或自動觸發機制，所以最不會踩到 sandbox 限制。
-
-### 在本機 Claude Code 用（可自動觸發）
-
-本機若能建立 `.claude/`，可把資料夾放到 skills 目錄，讓 Claude 依描述**自動觸發**（不必每次點名）：
-
-- 只在某個專案用：`<專案>/.claude/skills/srt-fix/`
-- 全域都能用：`~/.claude/skills/srt-fix/`
-
-```bash
-git clone https://github.com/weber-yuan/srt-fix-skill ~/.claude/skills/srt-fix
-```
+> ⚠️ 如果這個目錄**原本就有自己的 `CLAUDE.md`**，直接覆蓋會蓋掉你原有的專案指示。這時請改用一個獨立資料夾，或把本檔內容**附加**到你現有的 `CLAUDE.md` 後面。
 
 ### 需要安裝什麼？
 

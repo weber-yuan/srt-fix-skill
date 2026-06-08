@@ -35,11 +35,11 @@
 <body>
 <main>
 
-<h1>srt-fix — 字幕修正與斷句 Skill</h1>
+<h1>srt-fix — 字幕修正與斷句工具</h1>
 
-<p><span class="badge">Claude Code / Cowork Skill</span> <span class="badge">繁體中文</span> <span class="badge">零 pip 依賴</span></p>
+<p><span class="badge">Claude Code / Cowork</span> <span class="badge">CLAUDE.md 自動載入</span> <span class="badge">繁體中文</span> <span class="badge">零 pip 依賴</span></p>
 
-<p>一個給 <strong>Claude Code / Claude Cowork</strong> 用的 skill：把現成的 SRT 字幕（通常來自語音辨識 / ASR）整理乾淨——<strong>修正同音字與錯別字、正規化數字格式、再把長句斷成適合上字幕的短句</strong>。輸出繁體中文（台灣用語）。</p>
+<p>一個給 <strong>Claude Code / Claude Cowork</strong> 用的工具（透過 <code>CLAUDE.md</code> 自動載入）：把現成的 SRT 字幕（通常來自語音辨識 / ASR）整理乾淨——<strong>修正同音字與錯別字、正規化數字格式、再把長句斷成適合上字幕的短句</strong>。輸出繁體中文（台灣用語）。</p>
 
 <h2>它做什麼</h2>
 <table>
@@ -76,14 +76,12 @@
 <p><strong>最終輸出</strong>：<code>&lt;名&gt;.corrected.srt</code>（修正後）、<code>&lt;名&gt;.final.srt</code>（斷句後），外加一份修改摘要。</p>
 
 <h2>安裝與使用</h2>
-
-<h3>在 Cowork 專案裡用（推薦，不需要 <code>.claude/</code>）</h3>
-<p>Cowork 的 sandbox 可能<strong>不允許建立 <code>.</code> 開頭的隱藏目錄</strong>（例如 <code>.claude/</code>）。最簡單可靠的方式：把這個 repo 的檔案<strong>直接放進你的工作目錄</strong>，再讓 Cowork 讀 <code>SKILL.md</code>。</p>
+<p>採用 <strong><code>CLAUDE.md</code> 自動載入</strong>機制：Claude Code / Cowork 會<strong>自動讀取工作目錄下的 <code>CLAUDE.md</code></strong>。所以你只要把檔案放進一個工作目錄就能直接用——<strong>不需要 <code>.claude/</code> 隱藏目錄、也不需要任何「skill 安裝」步驟</strong>（正好避開 Cowork sandbox 不能建立 <code>.</code> 開頭目錄的限制）。</p>
 <ol>
-  <li>指定一個工作目錄（例如你的專案資料夾 <code>my-project/</code>）。</li>
-  <li>把 repo 的檔案<strong>直接放進該目錄</strong>——<strong>不要再多包一層 <code>srt-fix/</code></strong>。放好後，<code>SKILL.md</code>、<code>scripts/</code>、<code>data/</code> 應該就直接在工作目錄底下：
-    <pre><code>my-project/
-├── SKILL.md
+  <li>指定一個工作目錄（建議用一個<strong>專門處理字幕的資料夾</strong>，例如 <code>my-subs/</code>）。</li>
+  <li>把 repo 的檔案<strong>直接放進該目錄</strong>——<strong>不要再多包一層 <code>srt-fix/</code></strong>。放好後，<code>CLAUDE.md</code>、<code>scripts/</code>、<code>data/</code> 應該就直接在工作目錄底下：
+    <pre><code>my-subs/
+├── CLAUDE.md
 ├── scripts/srt_tools.py
 ├── data/vocab.json
 └── examples/ …</code></pre>
@@ -91,25 +89,17 @@
     <ul>
       <li><strong>下載 ZIP（最簡單）</strong>：GitHub → <strong>Code → Download ZIP</strong>，解壓後把<strong>裡面的檔案</strong>（不是外層那層資料夾）搬進工作目錄。</li>
       <li><strong>clone 到目前目錄</strong>（目錄需為空，注意結尾的 <code>.</code>）：
-        <pre><code>cd my-project
+        <pre><code>cd my-subs
 git clone https://github.com/weber-yuan/srt-fix-skill .</code></pre>
       </li>
     </ul>
   </li>
-  <li><strong>使用方式</strong>：在該目錄對 Cowork 說：
-    <blockquote>「讀 <code>SKILL.md</code>，幫我修正字幕 <code>xxx.srt</code>」</blockquote>
-    Cowork 會讀 <code>SKILL.md</code>，照裡面的步驟去跑 <code>scripts/srt_tools.py</code>。
+  <li><strong>使用方式</strong>：把你的 <code>.srt</code> 也放進這個目錄，然後直接說：
+    <blockquote>「<strong>幫我修正字幕 <code>xxx.srt</code></strong>」</blockquote>
+    <code>CLAUDE.md</code> 已被自動讀取，Claude 會照裡面的流程去跑 <code>scripts/srt_tools.py</code>，不必你特別點名。
   </li>
 </ol>
-<blockquote>這個方式不依賴任何隱藏目錄或自動觸發機制，所以最不會踩到 sandbox 限制。</blockquote>
-
-<h3>在本機 Claude Code 用（可自動觸發）</h3>
-<p>本機若能建立 <code>.claude/</code>，可把資料夾放到 skills 目錄，讓 Claude 依描述<strong>自動觸發</strong>（不必每次點名）：</p>
-<ul>
-  <li>只在某個專案用：<code>&lt;專案&gt;/.claude/skills/srt-fix/</code></li>
-  <li>全域都能用：<code>~/.claude/skills/srt-fix/</code></li>
-</ul>
-<pre><code>git clone https://github.com/weber-yuan/srt-fix-skill ~/.claude/skills/srt-fix</code></pre>
+<blockquote>⚠️ 如果這個目錄<strong>原本就有自己的 <code>CLAUDE.md</code></strong>，直接覆蓋會蓋掉你原有的專案指示。這時請改用一個獨立資料夾，或把本檔內容<strong>附加</strong>到你現有的 <code>CLAUDE.md</code> 後面。</blockquote>
 
 <h3>需要安裝什麼？</h3>
 <p>只需要 <strong>Python 3.10 以上</strong>，<strong>除此之外什麼都不用裝</strong>——腳本只用 Python 標準庫，不需要 <code>pip install</code> 任何套件；找錯字用的上網查證是 Claude 內建功能。</p>
