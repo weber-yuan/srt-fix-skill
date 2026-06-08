@@ -22,6 +22,8 @@ description: >-
 
 隨附腳本 `scripts/srt_tools.py`（純 Python 標準庫，**不需 pip 安裝**）。它有三個子命令：
 
+> 路徑提醒：`scripts/srt_tools.py` 與本 `SKILL.md` 在**同一個 skill 資料夾**。下文指令中的 `scripts/...` 是**相對於該 skill 資料夾**的路徑。若你是被「讀 `某資料夾/SKILL.md`」這樣喚起的，執行指令前請先把工作目錄切到該 skill 資料夾，或把 `scripts/...` 換成完整路徑（如 `某資料夾/scripts/srt_tools.py`）。
+
 | 子命令 | 工作（不含 LLM） |
 |--------|------------------|
 | `prepare` | 解析 SRT → 套數字格式規則 → 掃描候選詞 → 產出「給你閱讀的精簡逐字稿」與「工作檔」 |

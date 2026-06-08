@@ -34,34 +34,38 @@
 
 **最終輸出**：`<名>.corrected.srt`（修正後）、`<名>.final.srt`（斷句後），外加一份修改摘要。
 
-## 安裝
+## 安裝與使用
 
-把整個資料夾（名稱保持 `srt-fix`）放到下列任一位置即可。
+### 在 Cowork 專案裡用（推薦，不需要 `.claude/`）
 
-### Claude Code（本機）
+Cowork 的 sandbox 可能**不允許建立 `.` 開頭的隱藏目錄**（例如 `.claude/`）。所以最簡單可靠的方式，就是用一個**一般資料夾**＋**讓 Cowork 直接讀 `SKILL.md`**：
 
-- **只在某個專案用**：放到該專案的 `.claude/skills/srt-fix/`
-- **全域都能用**：放到 `~/.claude/skills/srt-fix/`
+1. 在你的專案裡指定/建立一個**普通資料夾**（例如 `srt-fix/`，不要用 `.` 開頭的隱藏目錄）。
+2. 把這個 repo 的**所有檔案複製進去**：
+
+   ```bash
+   git clone https://github.com/weber-yuan/srt-fix-skill srt-fix
+   ```
+
+   （或在 GitHub 按 **Code → Download ZIP**，解壓後把內容放進該資料夾。）
+3. **使用方式**：直接請 Cowork **讀取該資料夾的 `SKILL.md` 並依其執行**，例如：
+
+   > 「讀 `srt-fix/SKILL.md`，照它的流程幫我修正 `episode1.srt`」
+
+   Cowork 會讀 `SKILL.md`，照裡面的步驟去跑 `srt-fix/scripts/srt_tools.py`。
+
+> 這個方式不依賴任何隱藏目錄或自動觸發機制，所以最不會踩到 sandbox 限制。
+
+### 在本機 Claude Code 用（可自動觸發）
+
+本機若能建立 `.claude/`，可把資料夾放到 skills 目錄，讓 Claude 依描述**自動觸發**（不必每次點名）：
+
+- 只在某個專案用：`<專案>/.claude/skills/srt-fix/`
+- 全域都能用：`~/.claude/skills/srt-fix/`
 
 ```bash
 git clone https://github.com/weber-yuan/srt-fix-skill ~/.claude/skills/srt-fix
 ```
-
-放在 skills 目錄時，Claude 會依描述自動觸發。
-
-### Cowork（專案用）
-
-**不需要、也不必寫入受保護的 `.claude/`**——直接放在你的專案工作目錄下即可，兩種放法都行：
-
-- **放成子資料夾**（建議，整包乾淨）：`<專案>/srt-fix/`
-
-  ```bash
-  git clone https://github.com/weber-yuan/srt-fix-skill srt-fix
-  ```
-
-- **直接放在工作目錄**：把這些檔案放在 `<專案>/` 底下也可以。
-
-放好後，丟一個 `.srt` 給它、說「**幫我用 srt-fix 修正這個字幕**」即可（明確提一下 `srt-fix`，Claude 就會讀取 `SKILL.md` 並依其執行）。
 
 ### 需要安裝什麼？
 

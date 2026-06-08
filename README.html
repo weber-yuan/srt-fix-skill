@@ -75,26 +75,30 @@
 </ul>
 <p><strong>最終輸出</strong>：<code>&lt;名&gt;.corrected.srt</code>（修正後）、<code>&lt;名&gt;.final.srt</code>（斷句後），外加一份修改摘要。</p>
 
-<h2>安裝</h2>
-<p>把整個資料夾（名稱保持 <code>srt-fix</code>）放到下列任一位置即可。</p>
+<h2>安裝與使用</h2>
 
-<h3>Claude Code（本機）</h3>
+<h3>在 Cowork 專案裡用（推薦，不需要 <code>.claude/</code>）</h3>
+<p>Cowork 的 sandbox 可能<strong>不允許建立 <code>.</code> 開頭的隱藏目錄</strong>（例如 <code>.claude/</code>）。所以最簡單可靠的方式，就是用一個<strong>一般資料夾</strong>＋<strong>讓 Cowork 直接讀 <code>SKILL.md</code></strong>：</p>
+<ol>
+  <li>在你的專案裡指定/建立一個<strong>普通資料夾</strong>（例如 <code>srt-fix/</code>，不要用 <code>.</code> 開頭的隱藏目錄）。</li>
+  <li>把這個 repo 的<strong>所有檔案複製進去</strong>：
+    <pre><code>git clone https://github.com/weber-yuan/srt-fix-skill srt-fix</code></pre>
+    （或在 GitHub 按 <strong>Code → Download ZIP</strong>，解壓後把內容放進該資料夾。）
+  </li>
+  <li><strong>使用方式</strong>：直接請 Cowork <strong>讀取該資料夾的 <code>SKILL.md</code> 並依其執行</strong>，例如：
+    <blockquote>「讀 <code>srt-fix/SKILL.md</code>，照它的流程幫我修正 <code>episode1.srt</code>」</blockquote>
+    Cowork 會讀 <code>SKILL.md</code>，照裡面的步驟去跑 <code>srt-fix/scripts/srt_tools.py</code>。
+  </li>
+</ol>
+<blockquote>這個方式不依賴任何隱藏目錄或自動觸發機制，所以最不會踩到 sandbox 限制。</blockquote>
+
+<h3>在本機 Claude Code 用（可自動觸發）</h3>
+<p>本機若能建立 <code>.claude/</code>，可把資料夾放到 skills 目錄，讓 Claude 依描述<strong>自動觸發</strong>（不必每次點名）：</p>
 <ul>
-  <li><strong>只在某個專案用</strong>：放到該專案的 <code>.claude/skills/srt-fix/</code></li>
-  <li><strong>全域都能用</strong>：放到 <code>~/.claude/skills/srt-fix/</code></li>
+  <li>只在某個專案用：<code>&lt;專案&gt;/.claude/skills/srt-fix/</code></li>
+  <li>全域都能用：<code>~/.claude/skills/srt-fix/</code></li>
 </ul>
 <pre><code>git clone https://github.com/weber-yuan/srt-fix-skill ~/.claude/skills/srt-fix</code></pre>
-<p>放在 skills 目錄時，Claude 會依描述自動觸發。</p>
-
-<h3>Cowork（專案用）</h3>
-<p><strong>不需要、也不必寫入受保護的 <code>.claude/</code></strong>——直接放在你的專案工作目錄下即可，兩種放法都行：</p>
-<ul>
-  <li><strong>放成子資料夾</strong>（建議，整包乾淨）：<code>&lt;專案&gt;/srt-fix/</code>
-    <pre><code>git clone https://github.com/weber-yuan/srt-fix-skill srt-fix</code></pre>
-  </li>
-  <li><strong>直接放在工作目錄</strong>：把這些檔案放在 <code>&lt;專案&gt;/</code> 底下也可以。</li>
-</ul>
-<p>放好後，丟一個 <code>.srt</code> 給它、說「<strong>幫我用 srt-fix 修正這個字幕</strong>」即可（明確提一下 <code>srt-fix</code>，Claude 就會讀取 <code>SKILL.md</code> 並依其執行）。</p>
 
 <h3>需要安裝什麼？</h3>
 <p>只需要 <strong>Python 3.10 以上</strong>，<strong>除此之外什麼都不用裝</strong>——腳本只用 Python 標準庫，不需要 <code>pip install</code> 任何套件；找錯字用的上網查證是 Claude 內建功能。</p>
