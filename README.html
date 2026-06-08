@@ -41,10 +41,6 @@
 
 <p>一個給 <strong>Claude Code / Claude Cowork</strong> 用的 skill：把現成的 SRT 字幕（通常來自語音辨識 / ASR）整理乾淨——<strong>修正同音字與錯別字、正規化數字格式、再把長句斷成適合上字幕的短句</strong>。輸出繁體中文（台灣用語）。</p>
 
-<blockquote>
-衍生並重構自 <a href="https://github.com/sunyuzheng/kdb-post-production"><code>sunyuzheng/kdb-post-production</code></a> 的字幕校對與斷句邏輯。把六步流水線中的「字幕修正＋斷句」單獨抽出，做成跨平台、agent 驅動、零外部依賴的獨立 skill，並修正了原專案在 Windows 與驗證層上的數個問題。
-</blockquote>
-
 <h2>它做什麼</h2>
 <table>
   <thead><tr><th>能力</th><th>說明</th></tr></thead>
@@ -85,7 +81,7 @@
 <p>需要，但你通常<strong>不必另外安裝</strong>：Claude Code 與 Cowork 的執行環境本來就內建 Python（Anthropic 官方 skills 如 pdf/docx/xlsx 也都靠 Python 跑）。腳本只用標準庫，不需任何 pip 套件。</p>
 
 <h2>直接用腳本（不透過 Claude 也行）</h2>
-<pre><code>python scripts/srt_tools.py prepare 你的字幕.srt --vocab data/vocab.json --seeds 嘉賓名 品牌名
+<pre><code>python scripts/srt_tools.py prepare 你的字幕.srt --vocab data/vocab.json --seeds 來賓名 品牌名
 # 自己編輯 你的字幕.corrections.json（[{"original","corrected","reason"}, ...]）
 python scripts/srt_tools.py apply 你的字幕.work.json 你的字幕.corrections.json
 python scripts/srt_tools.py split 你的字幕.corrected.srt --max-chars 20</code></pre>
@@ -99,7 +95,7 @@ python scripts/srt_tools.py split 你的字幕.corrected.srt --max-chars 20</cod
 <h2>授權與出處</h2>
 <p>本 skill 衍生自 <code>sunyuzheng/kdb-post-production</code>。請依原專案授權條款使用；本 repo 的改作部分以 MIT 釋出（見 <code>LICENSE</code>）。</p>
 
-<footer>© 2026 weber-yuan · MIT License · 衍生自 sunyuzheng/kdb-post-production</footer>
+<footer>© 2026 weber-yuan · MIT License</footer>
 
 </main>
 </body>

@@ -41,7 +41,7 @@ description: >-
 ### 步驟 1：prepare（機械層先跑）
 
 ```bash
-python scripts/srt_tools.py prepare <字幕.srt> [--vocab data/vocab.json] [--seeds 嘉賓名 品牌名]
+python scripts/srt_tools.py prepare <字幕.srt> [--vocab data/vocab.json] [--seeds 來賓名 品牌名]
 ```
 
 這會：

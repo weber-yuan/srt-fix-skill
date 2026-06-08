@@ -2,8 +2,6 @@
 
 一個給 **Claude Code / Claude Cowork** 用的 skill：把現成的 SRT 字幕（通常來自語音辨識 / ASR）整理乾淨——**修正同音字與錯別字、正規化數字格式、再把長句斷成適合上字幕的短句**。輸出繁體中文（台灣用語）。
 
-> 衍生並重構自 [`sunyuzheng/kdb-post-production`](https://github.com/sunyuzheng/kdb-post-production) 的字幕校對與斷句邏輯。把六步流水線中的「字幕修正＋斷句」單獨抽出，做成跨平台、agent 驅動、零外部依賴的獨立 skill，並修正了原專案在 Windows 與驗證層上的數個問題。
-
 ## 它做什麼
 
 | 能力 | 說明 |
@@ -53,7 +51,7 @@ git clone https://github.com/<你的帳號>/srt-fix-skill ~/.claude/skills/srt-f
 ## 直接用腳本（不透過 Claude 也行）
 
 ```bash
-python scripts/srt_tools.py prepare 你的字幕.srt --vocab data/vocab.json --seeds 嘉賓名 品牌名
+python scripts/srt_tools.py prepare 你的字幕.srt --vocab data/vocab.json --seeds 來賓名 品牌名
 # 自己編輯 你的字幕.corrections.json（[{"original","corrected","reason"}, ...]）
 python scripts/srt_tools.py apply 你的字幕.work.json 你的字幕.corrections.json
 python scripts/srt_tools.py split 你的字幕.corrected.srt --max-chars 20

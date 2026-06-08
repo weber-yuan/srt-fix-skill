@@ -152,7 +152,7 @@ def scan_hints(chunks: list[dict], vocab: dict, seeds: list[str]) -> list[dict]:
     """掃描全文，找出候選詞庫裡列出的「容易聽錯」詞彙的出現位置，做成提示清單。
 
     這些只是「提示」，不是強制修改——最終是否要改由 Claude 結合上下文判斷。
-    seeds（本集嘉賓名/專有名詞）也會被當成重要詞，提醒 Claude 留意一致性。
+    seeds（本集來賓名/專有名詞）也會被當成重要詞，提醒 Claude 留意一致性。
     """
     candidates = dict(vocab.get("verified_candidates", {}))
     hints: list[dict] = []
@@ -517,7 +517,7 @@ def main() -> None:
     p_prepare = sub.add_parser("prepare", help="解析 SRT + 套數字規則 + 掃描候選詞")
     p_prepare.add_argument("input", help="輸入 .srt 路徑")
     p_prepare.add_argument("--vocab", default=None, help="候選詞庫 JSON 路徑（可選）")
-    p_prepare.add_argument("--seeds", nargs="*", default=[], help="本集專有名詞/嘉賓名（可選）")
+    p_prepare.add_argument("--seeds", nargs="*", default=[], help="本集專有名詞/來賓名（可選）")
     p_prepare.set_defaults(func=cmd_prepare)
 
     p_apply = sub.add_parser("apply", help="套用 Claude 的修正清單")
