@@ -76,13 +76,20 @@
 <p><strong>最終輸出</strong>：<code>&lt;名&gt;.corrected.srt</code>（修正後）、<code>&lt;名&gt;.final.srt</code>（斷句後），外加一份修改摘要。</p>
 
 <h2>安裝</h2>
-<p>把整個資料夾放到 Claude 的 skills 目錄即可（資料夾名就是 skill 名 <code>srt-fix</code>）：</p>
+<p>把整個資料夾（名稱保持 <code>srt-fix</code>）放到下列任一位置即可。</p>
+
+<h3>Claude Code（本機）</h3>
 <ul>
   <li><strong>只在某個專案用</strong>：放到該專案的 <code>.claude/skills/srt-fix/</code></li>
-  <li><strong>全域（含各處 Cowork）用</strong>：放到 <code>~/.claude/skills/srt-fix/</code></li>
+  <li><strong>全域都能用</strong>：放到 <code>~/.claude/skills/srt-fix/</code></li>
 </ul>
 <pre><code>git clone https://github.com/weber-yuan/srt-fix-skill ~/.claude/skills/srt-fix</code></pre>
-<p>之後在 Claude Code / Cowork 裡，丟一個 <code>.srt</code> 給它、說「幫我修正這個字幕」即可，skill 會自動被喚起。</p>
+<p>放在 skills 目錄時，Claude 會依描述自動觸發。</p>
+
+<h3>Cowork</h3>
+<p>Cowork 的 <code>.claude/</code> 往往是<strong>受保護路徑、不一定能寫入</strong>。最簡單的做法是<strong>直接把這個資料夾放在你的工作目錄下</strong>，不必塞進 <code>.claude/</code>：</p>
+<pre><code>git clone https://github.com/weber-yuan/srt-fix-skill srt-fix</code></pre>
+<p>放在工作目錄時，丟一個 <code>.srt</code> 給它、說「<strong>幫我用 srt-fix 修正這個字幕</strong>」即可（明確提一下 <code>srt-fix</code> 最保險，Claude 就會讀取 <code>SKILL.md</code> 並依其執行）。</p>
 
 <h3>需要安裝什麼？</h3>
 <p>只需要 <strong>Python 3.10 以上</strong>，<strong>除此之外什麼都不用裝</strong>——腳本只用 Python 標準庫，不需要 <code>pip install</code> 任何套件；找錯字用的上網查證是 Claude 內建功能。</p>

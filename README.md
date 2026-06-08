@@ -36,16 +36,28 @@
 
 ## 安裝
 
-把整個資料夾放到 Claude 的 skills 目錄即可（資料夾名就是 skill 名 `srt-fix`）：
+把整個資料夾（名稱保持 `srt-fix`）放到下列任一位置即可。
+
+### Claude Code（本機）
 
 - **只在某個專案用**：放到該專案的 `.claude/skills/srt-fix/`
-- **全域（含各處 Cowork）用**：放到 `~/.claude/skills/srt-fix/`
+- **全域都能用**：放到 `~/.claude/skills/srt-fix/`
 
 ```bash
-git clone https://github.com/<你的帳號>/srt-fix-skill ~/.claude/skills/srt-fix
+git clone https://github.com/weber-yuan/srt-fix-skill ~/.claude/skills/srt-fix
 ```
 
-之後在 Claude Code / Cowork 裡，丟一個 `.srt` 給它、說「幫我修正這個字幕」即可，skill 會自動被喚起。
+放在 skills 目錄時，Claude 會依描述自動觸發。
+
+### Cowork
+
+Cowork 的 `.claude/` 往往是**受保護路徑、不一定能寫入**。最簡單的做法是**直接把這個資料夾放在你的工作目錄下**，不必塞進 `.claude/`：
+
+```bash
+git clone https://github.com/weber-yuan/srt-fix-skill srt-fix
+```
+
+放在工作目錄時，丟一個 `.srt` 給它、說「**幫我用 srt-fix 修正這個字幕**」即可（明確提一下 `srt-fix` 最保險，Claude 就會讀取 `SKILL.md` 並依其執行）。
 
 ### 需要安裝什麼？
 
