@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>srt-fix — 字幕修正與斷句 Skill</title>
+<style>
+  :root { --fg:#1f2328; --muted:#656d76; --border:#d0d7de; --bg:#ffffff; --code:#f6f8fa; --accent:#0969da; }
+  @media (prefers-color-scheme: dark) {
+    :root { --fg:#e6edf3; --muted:#9198a1; --border:#30363d; --bg:#0d1117; --code:#161b22; --accent:#4493f8; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg);
+    font-family:-apple-system,"Segoe UI","PingFang TC","Microsoft JhengHei",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.7; }
+  main { max-width:860px; margin:0 auto; padding:48px 24px 80px; }
+  h1 { font-size:2em; border-bottom:1px solid var(--border); padding-bottom:.3em; margin-top:0; }
+  h2 { font-size:1.4em; border-bottom:1px solid var(--border); padding-bottom:.3em; margin-top:2em; }
+  h3 { font-size:1.1em; margin-top:1.6em; }
+  a { color:var(--accent); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  blockquote { margin:1em 0; padding:.4em 1em; color:var(--muted); border-left:4px solid var(--border); }
+  code { background:var(--code); padding:.2em .4em; border-radius:6px; font-size:.88em;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace; }
+  pre { background:var(--code); padding:16px; border-radius:8px; overflow:auto; line-height:1.45; }
+  pre code { background:none; padding:0; }
+  table { border-collapse:collapse; width:100%; margin:1em 0; display:block; overflow:auto; }
+  th,td { border:1px solid var(--border); padding:8px 13px; text-align:left; }
+  th { background:var(--code); }
+  .badge { display:inline-block; background:var(--code); border:1px solid var(--border);
+    border-radius:999px; padding:2px 12px; font-size:.85em; color:var(--muted); }
+  footer { margin-top:3em; padding-top:1em; border-top:1px solid var(--border); color:var(--muted); font-size:.9em; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>srt-fix — 字幕修正與斷句 Skill</h1>
+
+<p><span class="badge">Claude Code / Cowork Skill</span> <span class="badge">繁體中文</span> <span class="badge">零 pip 依賴</span></p>
+
+<p>一個給 <strong>Claude Code / Claude Cowork</strong> 用的 skill：把現成的 SRT 字幕（通常來自語音辨識 / ASR）整理乾淨——<strong>修正同音字與錯別字、正規化數字格式、再把長句斷成適合上字幕的短句</strong>。輸出繁體中文（台灣用語）。</p>
+
+<blockquote>
+衍生並重構自 <a href="https://github.com/sunyuzheng/kdb-post-production"><code>sunyuzheng/kdb-post-production</code></a> 的字幕校對與斷句邏輯。把六步流水線中的「字幕修正＋斷句」單獨抽出，做成跨平台、agent 驅動、零外部依賴的獨立 skill，並修正了原專案在 Windows 與驗證層上的數個問題。
+</blockquote>
+
+<h2>它做什麼</h2>
+<table>
+  <thead><tr><th>能力</th><th>說明</th></tr></thead>
+  <tbody>
+    <tr><td>數字格式規範化</td><td>百分之百→100%、百分之十→10%、兩百→200、兩千→2000（自動避開「一兩百」等量詞）</td></tr>
+    <tr><td>ASR 同音字 / 錯別字修正</td><td>由 Claude 結合上下文找出，例：神經網落→神經網路、西洋騎→西洋棋、Cloud→Claude</td></tr>
+    <tr><td>斷句</td><td>長句斷成 ≤N 字短句，標點優先，時間戳依字數比例自動重算（不會切斷 100%、Python 等 token）</td></tr>
+    <tr><td>先確認再套用</td><td>預設會把修改清單列給你過目、同意後才寫檔</td></tr>
+  </tbody>
+</table>
+
+<p><strong>不會做</strong>：增刪實詞、同義詞替換、刪口語重複、亂動時間戳——寧可漏改不誤改，保住真實語音。</p>
+
+<h2>設計</h2>
+<p>機械性、確定性的工作（解析 SRT、套規則、驗證、全文取代、斷句時間戳插值、大檔 I/O）交給隨附的 Python 腳本 <code>scripts/srt_tools.py</code>（<strong>純標準庫，零 pip 安裝</strong>）；需要語意判斷的「哪個字是同音錯字」由執行 skill 的 Claude 親自做。</p>
+
+<h2>流程</h2>
+<pre><code>輸入：任意 .srt（+ 可選本集專有名詞、可選自訂 vocab.json）
+  │
+ [1] srt_tools.py prepare  → 套數字規則 + 掃描候選詞 → 產出精簡逐字稿 + 工作檔
+ [2] Claude 讀逐字稿 → 列出修正清單 {original, corrected, reason}
+ [3] 先把清單給你確認（可挑掉某幾筆）
+ [4] srt_tools.py apply    → 驗證守門 + 全文取代 → &lt;名&gt;.corrected.srt
+ [5] srt_tools.py split    → 斷句 → &lt;名&gt;.final.srt
+  │
+輸出：&lt;名&gt;.corrected.srt、&lt;名&gt;.final.srt ＋ 修改摘要</code></pre>
+
+<h2>安裝</h2>
+<p>把整個資料夾放到 Claude 的 skills 目錄即可（資料夾名就是 skill 名 <code>srt-fix</code>）：</p>
+<ul>
+  <li><strong>只在某個專案用</strong>：放到該專案的 <code>.claude/skills/srt-fix/</code></li>
+  <li><strong>全域（含各處 Cowork）用</strong>：放到 <code>~/.claude/skills/srt-fix/</code></li>
+</ul>
+<pre><code>git clone https://github.com/weber-yuan/srt-fix-skill ~/.claude/skills/srt-fix</code></pre>
+<p>之後在 Claude Code / Cowork 裡，丟一個 <code>.srt</code> 給它、說「幫我修正這個字幕」即可，skill 會自動被喚起。</p>
+
+<h3>需要 Python 嗎？</h3>
+<p>需要，但你通常<strong>不必另外安裝</strong>：Claude Code 與 Cowork 的執行環境本來就內建 Python（Anthropic 官方 skills 如 pdf/docx/xlsx 也都靠 Python 跑）。腳本只用標準庫，不需任何 pip 套件。</p>
+
+<h2>直接用腳本（不透過 Claude 也行）</h2>
+<pre><code>python scripts/srt_tools.py prepare 你的字幕.srt --vocab data/vocab.json --seeds 嘉賓名 品牌名
+# 自己編輯 你的字幕.corrections.json（[{"original","corrected","reason"}, ...]）
+python scripts/srt_tools.py apply 你的字幕.work.json 你的字幕.corrections.json
+python scripts/srt_tools.py split 你的字幕.corrected.srt --max-chars 20</code></pre>
+
+<h2>範例</h2>
+<p><code>examples/</code> 內含一個刻意放了錯字的 <code>sample.qwen.srt</code>，以及修正清單與前後輸出，可照流程跑一遍體驗。</p>
+
+<h2>候選詞庫（可選）</h2>
+<p><code>data/vocab.json</code> 可填入你領域裡容易被聽錯的人名/品牌/術語，prepare 掃描時會提示 Claude 留意。預設只有一個範例條目，可自由擴充。</p>
+
+<h2>授權與出處</h2>
+<p>本 skill 衍生自 <code>sunyuzheng/kdb-post-production</code>。請依原專案授權條款使用；本 repo 的改作部分以 MIT 釋出（見 <code>LICENSE</code>）。</p>
+
+<footer>© 2026 weber-yuan · MIT License · 衍生自 sunyuzheng/kdb-post-production</footer>
+
+</main>
+</body>
+</html>

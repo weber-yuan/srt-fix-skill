@@ -1,0 +1,6 @@
+[
+  {"original": "神經網落", "corrected": "神經網路", "reason": "同音字，應為網路"},
+  {"original": "模行", "corrected": "模型", "reason": "同音字，應為模型"},
+  {"original": "西洋騎", "corrected": "西洋棋", "reason": "棋類，騎→棋"},
+  {"original": "半人馬騎", "corrected": "半人馬棋", "reason": "半人馬棋（人類+AI 下棋）"}
+]

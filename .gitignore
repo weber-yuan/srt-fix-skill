@@ -1,0 +1,11 @@
+# 執行過程產生的中間/輸出檔（範例輸出有刻意保留，不在此忽略）
+*.work.json
+*.prepared.txt
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
