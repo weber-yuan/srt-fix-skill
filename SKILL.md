@@ -32,13 +32,24 @@ description: >-
 
 ## 完整流程
 
-整體是：**prepare → （你找錯字）→ 先給使用者確認 → apply → split**。
+這是一條**序列管線**：每一步都吃前一步的產物，必須依序執行。下表標明每步「由誰執行、讀入什麼、產出什麼」：
+
+| 步驟 | 由誰執行 | 讀入 | 產出 |
+|------|----------|------|------|
+| 1. prepare | 🐍 Python（`srt_tools.py`） | 原始 `.srt` | `<stem>.work.json`、`<stem>.prepared.txt` |
+| 2. 找同音字/錯別字 | 🤖 你（Claude） | `<stem>.prepared.txt` | `<stem>.corrections.json` |
+| 3. 給使用者確認 | 🤖 你（Claude）＋ 使用者 | `<stem>.corrections.json` | 核准/挑選後的清單 |
+| 4. apply | 🐍 Python | `<stem>.work.json` ＋ `<stem>.corrections.json` | `<stem>.corrected.srt` |
+| 5. split | 🐍 Python | `<stem>.corrected.srt` | `<stem>.final.srt` |
+
+**只有步驟 2（找錯字）是 AI 的判斷工作**；解析、套用、斷句都是 Python 腳本的機械處理。
+**能否並行？** 單一檔案內**不能**——每步都依賴上一步的輸出（例如 split 一定要先有 `corrected.srt`）。若一次要處理**多個**字幕檔，各檔的管線彼此獨立，可分別並行。
 
 ### 步驟 0：確認輸入
 
 確認使用者提供的 `.srt` 路徑。若使用者另外給了本集的專有名詞/人名/品牌（容易被 ASR 聽錯的詞），記下來，等一下用 `--seeds` 傳入。
 
-### 步驟 1：prepare（機械層先跑）
+### 步驟 1：prepare —— 由 🐍 Python 執行（機械層先跑）
 
 ```bash
 python scripts/srt_tools.py prepare <字幕.srt> [--vocab data/vocab.json] [--seeds 來賓名 品牌名]
@@ -51,7 +62,7 @@ python scripts/srt_tools.py prepare <字幕.srt> [--vocab data/vocab.json] [--se
   - `<stem>.prepared.txt`：**給你閱讀**的精簡逐字稿（每行一個區塊，前面有 `[索引]`）。
   - `<stem>.work.json`：套完數字規則後的工作狀態，**apply 會用到**。
 
-### 步驟 2：你親自找出同音字/錯別字
+### 步驟 2：找出同音字/錯別字 —— 由 🤖 你（Claude）執行
 
 用 Read 讀 `<stem>.prepared.txt`（若檔案很大，分段讀）。你的任務是找出**語音辨識造成的錯字**，輸出一份修正清單。
 
@@ -59,6 +70,14 @@ python scripts/srt_tools.py prepare <字幕.srt> [--vocab data/vocab.json] [--se
 - 同音字混淆（例：「神經網落」→「神經網路」、「西洋騎」→「西洋棋」、「芝士」其實是「知識」）。
 - 英文品牌/術語拼錯（例：「Cloud」其實是「Claude」、「Benjio」→「Bengio」）。
 - 明顯的成語/詞語誤聽（例：「吃不完豆子走」→「吃不完兜著走」）。
+
+**遇到不確定的專有名詞，先上網查證（重要）：**
+逐字稿裡常有你沒看過、或不確定正確寫法的人名、機構、學校、品牌、產品名（例如「台灣數位學校」「臺北數位高中」這類）。**不要憑印象猜，也不要因為沒把握就一律放著不管**——用 WebSearch / WebFetch 上網查證正確名稱，再決定怎麼做：
+- 查到正確寫法，且逐字稿明顯是同音之誤 → 修正成正確名稱。
+- 查證後確認逐字稿其實是對的 → 不要改。
+- 查不到或仍不確定 → 保持原文，並在給使用者的摘要裡標註「此專有名詞請您確認」。
+
+ASR 最容易錯在專有名詞上，查證能大幅提升正確率，也避免把本來正確的名字改錯。
 
 **絕對不要做（這些會破壞真實語音）：**
 - 不要增刪實詞（名詞、動詞、形容詞），不要同義詞替換、不要重新措辭。
@@ -82,12 +101,12 @@ python scripts/srt_tools.py prepare <字幕.srt> [--vocab data/vocab.json] [--se
 - 同一個錯字寫一筆即可——apply 會自動把**全文所有出現處**一起改。
 - 輸出必須是**繁體中文（台灣用語）**，不要改成簡體。
 
-### 步驟 3：先給使用者確認（預設行為，很重要）
+### 步驟 3：先給使用者確認 —— 由 🤖 你（Claude）＋ 使用者（預設行為，很重要）
 
 **在套用前**，把這份修正清單（加上步驟 1 印出的數字格式變更）整理成清楚的表格給使用者過目，請他同意或挑掉某幾筆。例如附上每筆的上下文，方便判斷。
 除非使用者明講「不用確認、直接做」，否則一律先確認。使用者可能會要你拿掉某幾筆，照辦後再進行。
 
-### 步驟 4：apply（套用修正）
+### 步驟 4：apply —— 由 🐍 Python 執行（套用修正）
 
 ```bash
 python scripts/srt_tools.py apply <stem>.work.json <stem>.corrections.json
@@ -95,7 +114,7 @@ python scripts/srt_tools.py apply <stem>.work.json <stem>.corrections.json
 
 腳本會先**驗證守門**（長度、編輯距離、數字、去重），把可疑的修正擋下並列出原因，再把通過的修正套到全文所有出現處，寫出 `<stem>.corrected.srt`。它會印出「已套用 N 種、共 M 處；擋下 K 筆」的摘要——把摘要回報給使用者。
 
-### 步驟 5：split（斷句）
+### 步驟 5：split —— 由 🐍 Python 執行（斷句）
 
 ```bash
 python scripts/srt_tools.py split <stem>.corrected.srt --max-chars 20

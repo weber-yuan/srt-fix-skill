@@ -58,15 +58,22 @@
 <p>機械性、確定性的工作（解析 SRT、套規則、驗證、全文取代、斷句時間戳插值、大檔 I/O）交給隨附的 Python 腳本 <code>scripts/srt_tools.py</code>（<strong>純標準庫，零 pip 安裝</strong>）；需要語意判斷的「哪個字是同音錯字」由執行 skill 的 Claude 親自做。</p>
 
 <h2>流程</h2>
-<pre><code>輸入：任意 .srt（+ 可選本集專有名詞、可選自訂 vocab.json）
-  │
- [1] srt_tools.py prepare  → 套數字規則 + 掃描候選詞 → 產出精簡逐字稿 + 工作檔
- [2] Claude 讀逐字稿 → 列出修正清單 {original, corrected, reason}
- [3] 先把清單給你確認（可挑掉某幾筆）
- [4] srt_tools.py apply    → 驗證守門 + 全文取代 → &lt;名&gt;.corrected.srt
- [5] srt_tools.py split    → 斷句 → &lt;名&gt;.final.srt
-  │
-輸出：&lt;名&gt;.corrected.srt、&lt;名&gt;.final.srt ＋ 修改摘要</code></pre>
+<p>整條是一條<strong>序列管線</strong>：每一步吃前一步的產物，必須依序執行。只有「找錯字」那一步是 AI 做的，其餘都是 Python 腳本的機械處理。</p>
+<table>
+  <thead><tr><th>步驟</th><th>由誰執行</th><th>讀入</th><th>產出</th></tr></thead>
+  <tbody>
+    <tr><td>1. <code>prepare</code></td><td>🐍 Python</td><td>原始 <code>.srt</code></td><td><code>&lt;名&gt;.work.json</code>、<code>&lt;名&gt;.prepared.txt</code></td></tr>
+    <tr><td>2. 找同音字/錯別字</td><td>🤖 AI（Claude）</td><td><code>&lt;名&gt;.prepared.txt</code></td><td><code>&lt;名&gt;.corrections.json</code></td></tr>
+    <tr><td>3. 給你確認</td><td>🤖 AI ＋ 你</td><td><code>&lt;名&gt;.corrections.json</code></td><td>核准/挑選後的清單</td></tr>
+    <tr><td>4. <code>apply</code></td><td>🐍 Python</td><td><code>.work.json</code> ＋ <code>.corrections.json</code></td><td><code>&lt;名&gt;.corrected.srt</code></td></tr>
+    <tr><td>5. <code>split</code></td><td>🐍 Python</td><td><code>&lt;名&gt;.corrected.srt</code></td><td><code>&lt;名&gt;.final.srt</code></td></tr>
+  </tbody>
+</table>
+<ul>
+  <li><strong>能不能並行？</strong> 單一檔案內<strong>不行</strong>——每步都依賴上一步的輸出（例如 <code>split</code> 一定要先有 <code>corrected.srt</code>）。若一次處理<strong>多個</strong>字幕檔，各檔的管線彼此獨立，可分開並行。</li>
+  <li><strong>步驟 2 遇到沒把握的專有名詞</strong>（人名/機構/學校/品牌）時，AI 會先<strong>上網查證</strong>正確寫法再決定要不要改，而不是憑空猜。</li>
+</ul>
+<p><strong>最終輸出</strong>：<code>&lt;名&gt;.corrected.srt</code>（修正後）、<code>&lt;名&gt;.final.srt</code>（斷句後），外加一份修改摘要。</p>
 
 <h2>安裝</h2>
 <p>把整個資料夾放到 Claude 的 skills 目錄即可（資料夾名就是 skill 名 <code>srt-fix</code>）：</p>

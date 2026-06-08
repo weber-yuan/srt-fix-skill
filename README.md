@@ -19,17 +19,20 @@
 
 ## 流程
 
-```
-輸入：任意 .srt（+ 可選本集專有名詞、可選自訂 vocab.json）
-  │
- [1] srt_tools.py prepare  → 套數字規則 + 掃描候選詞 → 產出精簡逐字稿 + 工作檔
- [2] Claude 讀逐字稿 → 列出修正清單 {original, corrected, reason}
- [3] 先把清單給你確認（可挑掉某幾筆）
- [4] srt_tools.py apply    → 驗證守門 + 全文取代 → <名>.corrected.srt
- [5] srt_tools.py split    → 斷句 → <名>.final.srt
-  │
-輸出：<名>.corrected.srt、<名>.final.srt ＋ 修改摘要
-```
+整條是一條**序列管線**：每一步吃前一步的產物，必須依序執行。只有「找錯字」那一步是 AI 做的，其餘都是 Python 腳本的機械處理。
+
+| 步驟 | 由誰執行 | 讀入 | 產出 |
+|------|----------|------|------|
+| 1. `prepare` | 🐍 Python | 原始 `.srt` | `<名>.work.json`、`<名>.prepared.txt` |
+| 2. 找同音字/錯別字 | 🤖 AI（Claude） | `<名>.prepared.txt` | `<名>.corrections.json` |
+| 3. 給你確認 | 🤖 AI ＋ 你 | `<名>.corrections.json` | 核准/挑選後的清單 |
+| 4. `apply` | 🐍 Python | `.work.json` ＋ `.corrections.json` | `<名>.corrected.srt` |
+| 5. `split` | 🐍 Python | `<名>.corrected.srt` | `<名>.final.srt` |
+
+- **能不能並行？** 單一檔案內**不行**——每步都依賴上一步的輸出（例如 `split` 一定要先有 `corrected.srt`）。若一次處理**多個**字幕檔，各檔的管線彼此獨立，可分開並行。
+- **步驟 2 遇到沒把握的專有名詞**（人名/機構/學校/品牌）時，AI 會先**上網查證**正確寫法再決定要不要改，而不是憑空猜。
+
+**最終輸出**：`<名>.corrected.srt`（修正後）、`<名>.final.srt`（斷句後），外加一份修改摘要。
 
 ## 安裝
 
