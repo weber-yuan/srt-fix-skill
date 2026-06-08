@@ -49,15 +49,19 @@ git clone https://github.com/weber-yuan/srt-fix-skill ~/.claude/skills/srt-fix
 
 放在 skills 目錄時，Claude 會依描述自動觸發。
 
-### Cowork
+### Cowork（專案用）
 
-Cowork 的 `.claude/` 往往是**受保護路徑、不一定能寫入**。最簡單的做法是**直接把這個資料夾放在你的工作目錄下**，不必塞進 `.claude/`：
+**不需要、也不必寫入受保護的 `.claude/`**——直接放在你的專案工作目錄下即可，兩種放法都行：
 
-```bash
-git clone https://github.com/weber-yuan/srt-fix-skill srt-fix
-```
+- **放成子資料夾**（建議，整包乾淨）：`<專案>/srt-fix/`
 
-放在工作目錄時，丟一個 `.srt` 給它、說「**幫我用 srt-fix 修正這個字幕**」即可（明確提一下 `srt-fix` 最保險，Claude 就會讀取 `SKILL.md` 並依其執行）。
+  ```bash
+  git clone https://github.com/weber-yuan/srt-fix-skill srt-fix
+  ```
+
+- **直接放在工作目錄**：把這些檔案放在 `<專案>/` 底下也可以。
+
+放好後，丟一個 `.srt` 給它、說「**幫我用 srt-fix 修正這個字幕**」即可（明確提一下 `srt-fix`，Claude 就會讀取 `SKILL.md` 並依其執行）。
 
 ### 需要安裝什麼？
 
