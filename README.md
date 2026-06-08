@@ -47,9 +47,15 @@ git clone https://github.com/<你的帳號>/srt-fix-skill ~/.claude/skills/srt-f
 
 之後在 Claude Code / Cowork 裡，丟一個 `.srt` 給它、說「幫我修正這個字幕」即可，skill 會自動被喚起。
 
-### 需要 Python 嗎？
+### 需要安裝什麼？
 
-需要，但你通常**不必另外安裝**：Claude Code 與 Cowork 的執行環境本來就內建 Python（Anthropic 官方 skills 如 pdf/docx/xlsx 也都靠 Python 跑）。腳本只用標準庫，不需任何 pip 套件。
+只需要 **Python 3.10 以上**，**除此之外什麼都不用裝**——腳本只用 Python 標準庫，不需要 `pip install` 任何套件；找錯字用的上網查證是 Claude 內建功能。
+
+- 在 **Claude Code / Cowork** 裡通常**不必另外安裝**：執行環境本來就內建 Python（Anthropic 官方 skills 如 pdf/docx/xlsx 也都靠 Python 跑）。
+- 在**自己的機器**上：skill 會在開始前先執行 `python --version` 確認；若沒裝或版本過舊，會**先詢問你**是否要協助安裝，同意後再依作業系統安裝：
+  - Windows：`winget install Python.Python.3.12`（或 <https://www.python.org/downloads/>）
+  - macOS：`brew install python`
+  - Linux：`sudo apt install -y python3`
 
 ## 直接用腳本（不透過 Claude 也行）
 

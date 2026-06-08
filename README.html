@@ -84,8 +84,18 @@
 <pre><code>git clone https://github.com/weber-yuan/srt-fix-skill ~/.claude/skills/srt-fix</code></pre>
 <p>之後在 Claude Code / Cowork 裡，丟一個 <code>.srt</code> 給它、說「幫我修正這個字幕」即可，skill 會自動被喚起。</p>
 
-<h3>需要 Python 嗎？</h3>
-<p>需要，但你通常<strong>不必另外安裝</strong>：Claude Code 與 Cowork 的執行環境本來就內建 Python（Anthropic 官方 skills 如 pdf/docx/xlsx 也都靠 Python 跑）。腳本只用標準庫，不需任何 pip 套件。</p>
+<h3>需要安裝什麼？</h3>
+<p>只需要 <strong>Python 3.10 以上</strong>，<strong>除此之外什麼都不用裝</strong>——腳本只用 Python 標準庫，不需要 <code>pip install</code> 任何套件；找錯字用的上網查證是 Claude 內建功能。</p>
+<ul>
+  <li>在 <strong>Claude Code / Cowork</strong> 裡通常<strong>不必另外安裝</strong>：執行環境本來就內建 Python（Anthropic 官方 skills 如 pdf/docx/xlsx 也都靠 Python 跑）。</li>
+  <li>在<strong>自己的機器</strong>上：skill 會在開始前先執行 <code>python --version</code> 確認；若沒裝或版本過舊，會<strong>先詢問你</strong>是否要協助安裝，同意後再依作業系統安裝：
+    <ul>
+      <li>Windows：<code>winget install Python.Python.3.12</code>（或 <a href="https://www.python.org/downloads/">python.org</a>）</li>
+      <li>macOS：<code>brew install python</code></li>
+      <li>Linux：<code>sudo apt install -y python3</code></li>
+    </ul>
+  </li>
+</ul>
 
 <h2>直接用腳本（不透過 Claude 也行）</h2>
 <pre><code>python scripts/srt_tools.py prepare 你的字幕.srt --vocab data/vocab.json --seeds 來賓名 品牌名

@@ -30,6 +30,24 @@ description: >-
 
 **為什麼要有腳本？** 因為解析時間戳、按比例重算斷句時間、全文取代、處理大檔 I/O 這些事，用程式做才精準可靠；而「哪個字是同音錯字」需要理解上下文，那才是你（Claude）該做的。大字幕檔（可能數百 KB）也由腳本負責讀寫，你只需閱讀腳本抽出的精簡逐字稿。
 
+## 前置需求與環境檢查（流程開始前先做一次）
+
+本 skill **只需要 Python 3.10 以上**。腳本全部使用 Python 標準庫，**不需要 `pip install` 任何套件**，也不需要其他外部工具——找錯字用的上網查證是你內建的 WebSearch / WebFetch，不必安裝。所以「除了 Python 之外，什麼都不用裝」。
+
+**開始流程前，先確認這台機器有沒有 Python：**
+
+1. 執行 `python --version`（若失敗，再試 `python3 --version` 或 Windows 的 `py --version`）。
+2. 依結果處理：
+   - **有 Python 且版本 ≥ 3.10** → 直接往下進行流程。
+   - **有 Python 但版本 < 3.10** → 告知使用者版本過舊（本 skill 用到 Python 3.10 的型別語法），詢問是否要協助升級，得到同意後再協助。
+   - **完全沒有 Python** → **不要自行安裝**。先告訴使用者「這台機器沒有偵測到 Python，本 skill 需要它來執行字幕處理腳本」，並**詢問是否要你協助安裝**。獲得同意後，依其作業系統提供安裝方式：
+     - Windows：`winget install Python.Python.3.12`（或到 <https://www.python.org/downloads/> 下載安裝程式）
+     - macOS：`brew install python`（或 python.org 安裝程式）
+     - Linux（Debian/Ubuntu）：`sudo apt update && sudo apt install -y python3`
+   - 安裝完成後，再跑一次 `python --version` 確認，才繼續流程。
+
+> 在 Claude Code / Cowork 的執行環境裡通常已內建 Python，這個檢查多半會直接通過；但別人在自己的機器上跑時不一定有，所以開始前務必先確認，沒有就先（經同意後）裝好。
+
 ## 完整流程
 
 這是一條**序列管線**：每一步都吃前一步的產物，必須依序執行。下表標明每步「由誰執行、讀入什麼、產出什麼」：
